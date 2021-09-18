@@ -5,6 +5,8 @@
 *.def
 *.win
 *.class
+*.o
+*.obj
 build/
 dist/
 lib/
