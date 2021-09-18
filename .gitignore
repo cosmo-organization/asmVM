@@ -1,0 +1,10 @@
+*.a
+*.dev
+*.dll
+*.layout
+*.def
+*.win
+*.class
+build/
+dist/
+lib/
