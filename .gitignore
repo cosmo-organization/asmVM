@@ -6,6 +6,7 @@
 *.win
 *.class
 *.o
+*.log
 *.obj
 build/
 dist/

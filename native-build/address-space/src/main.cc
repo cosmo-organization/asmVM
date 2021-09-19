@@ -3,9 +3,40 @@
 #include <stdlib.h>
 
 template<typename T>
+struct get_type{
+	static const int type;
+};
+template<>
+struct get_type<int>{
+	static const int type=INT;
+};
+template<>
+struct get_type<short>{
+	static const int type=SHORT;
+};
+template<>
+struct get_type<unsigned char>{
+	static const int type=BYTE;
+};
+template<>
+struct get_type<float>{
+	static const int type=FLOAT;
+};
+template<>
+struct get_type<double>{
+	static const int type=DOUBLE;
+};
+template<>
+struct get_type<long>{
+	static const int type=LONG;
+};
+
+
+template<typename T>
 static jlong locate(JNIEnv *env, jclass clz, jintArray dims){
 	Array<int>* iArray=(Array<int>*)malloc(sizeof(Array<int>));
 	iArray->ndim=env->GetArrayLength(dims);
+	iArray->type=get_type<T>::type;
 	iArray->dims=(int*)malloc(sizeof(int)*iArray->ndim);
 	jint* datas=env->GetIntArrayElements(dims,(jboolean*)0);
 	unsigned long size_of_array=1;
@@ -28,8 +59,33 @@ static void release(JNIEnv* env,jclass clz,jlong address){
 }
 
 template<typename T>
-static void put(JNIEnv* env,jclass clz,jint index,T value){
-	
+static void put(JNIEnv* env,jclass clz,jlong address,jint index,T value){
+	Array<T>* array=reinterpret_cast<Array<T>*>(address);
+	if (index>=array->size){
+		jclass exception_clz=env->FindClass(INDEX_OUT_OF_BOUND_CLASS);
+		if (!exception_clz)printf("CAn't find class\n");
+		char* msg=(char*)malloc(100);
+		sprintf(msg,"Index out of bound size:%d, index:%d (Index must be less than size)",array->size,index);
+		env->ThrowNew(exception_clz,msg);
+		free(msg);
+	}else{
+		array->pointer[index]=value;
+	}
+}
+
+template<typename T>
+static T get(JNIEnv* env,jclass clz,jlong address,jint index){
+	Array<T>* array=reinterpret_cast<Array<T>*>(address);
+	if (index>=array->size){
+		jclass exception_clz=env->FindClass(INDEX_OUT_OF_BOUND_CLASS);
+		if (!exception_clz)printf("Can't find class\n");
+		char* msg=(char*)malloc(100);
+		sprintf(msg,"Index out of bound size:%d, index:%d (Index must be less than size)",array->size,index);
+		env->ThrowNew(exception_clz,msg);
+		free(msg);
+	}else{
+		return array->pointer[index];
+	}
 }
 
 JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_locate_1int_1array(JNIEnv *env, jclass clz, jintArray dims){
@@ -86,8 +142,8 @@ JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_locate_1float_
  * Method:    put_int
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1int(JNIEnv *, jclass, jint, jint){
-	
+JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1int(JNIEnv *env, jclass clz,jlong address, jint index, jint value){
+	put(env,clz,address,index,value);
 }
 
 /*
@@ -95,8 +151,8 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1int(JNIEnv
  * Method:    put_short
  * Signature: (IS)V
  */
-JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1short(JNIEnv *, jclass, jint, jshort){
-	
+JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1short(JNIEnv *env, jclass clz,jlong address, jint index, jshort value){
+	put(env,clz,address,index,value);
 }
 
 /*
@@ -104,8 +160,8 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1short(JNIE
  * Method:    put_byte
  * Signature: (IB)V
  */
-JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1byte(JNIEnv *, jclass, jint, jbyte){
-	
+JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1byte(JNIEnv *env, jclass clz,jlong address, jint index , jbyte value){
+	put(env,clz,address,index,value);
 }
 
 /*
@@ -113,8 +169,8 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1byte(JNIEn
  * Method:    put_double
  * Signature: (ID)V
  */
-JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1double(JNIEnv *, jclass, jint, jdouble){
-	
+JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1double(JNIEnv *env, jclass clz,jlong address, jint index, jdouble value){
+	put(env,clz,address,index,value);
 }
 
 /*
@@ -122,8 +178,8 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1double(JNI
  * Method:    put_long
  * Signature: (IJ)V
  */
-JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1long(JNIEnv *, jclass, jint, jlong){
-	
+JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1long(JNIEnv *env, jclass clz,jlong address, jint index, jlong value){
+	put(env,clz,address,index,value);
 }
 
 /*
@@ -131,8 +187,8 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1long(JNIEn
  * Method:    put_float
  * Signature: (IF)V
  */
-JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1float(JNIEnv *, jclass, jint, jfloat){
-	
+JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_put_1float(JNIEnv *env, jclass clz,jlong address, jint index, jfloat value){
+	put(env,clz,address,index,value);
 }
 
 
@@ -190,4 +246,53 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_free_1long_1arr
  */
 JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_free_1float_1array(JNIEnv *env, jclass clz, jlong address){
 	release<float>(env,clz,address);
+}
+
+JNIEXPORT jint JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1int(JNIEnv *env, jclass clz, jlong address, jint index){
+	return get<int>(env,clz,address,index);
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_short
+ * Signature: (JI)S
+ */
+JNIEXPORT jshort JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1short(JNIEnv *env, jclass clz, jlong address, jint index){
+	return get<short>(env,clz,address,index);
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_byte
+ * Signature: (JI)B
+ */
+JNIEXPORT jbyte JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1byte(JNIEnv *env, jclass clz, jlong address, jint index){
+	return get<unsigned char>(env,clz,address,index);
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_double
+ * Signature: (JI)D
+ */
+JNIEXPORT jdouble JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1double(JNIEnv *env, jclass clz, jlong address, jint index){
+	return get<double>(env,clz,address,index);
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_long
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1long(JNIEnv *env, jclass clz, jlong address, jint index){
+	return get<long>(env,clz,address,index);
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_float
+ * Signature: (JI)F
+ */
+JNIEXPORT jfloat JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1float(JNIEnv *env, jclass clz, jlong address, jint index){
+	return get<float>(env,clz,address,index);
 }

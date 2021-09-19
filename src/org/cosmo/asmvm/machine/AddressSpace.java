@@ -42,4 +42,5 @@ public final class AddressSpace {
     public static native long get_long(long address,int idx);
     public static native float get_float(long address,int idx);
     
+    public static native int get_type_code(long address);
 }
