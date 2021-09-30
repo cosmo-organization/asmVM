@@ -45,7 +45,7 @@ static jlong locate(JNIEnv *env, jclass clz, jintArray dims){
 		size_of_array*=datas[i];
 	}
 	iArray->pointer=(int*)malloc(sizeof(int)*size_of_array);
-	env->ReleaseIntArrayElements(dims,datas,0);//may be crash point
+	env->ReleaseIntArrayElements(dims,datas,0);
   	iArray->size=size_of_array;
   	return (jlong)iArray;
 }
@@ -296,3 +296,36 @@ JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1long(JNIE
 JNIEXPORT jfloat JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1float(JNIEnv *env, jclass clz, jlong address, jint index){
 	return get<float>(env,clz,address,index);
 }
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_type_code
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1code(JNIEnv *env, jclass clz, jlong address){
+  	Array<void*>* array=reinterpret_cast<Array<void*>*>(address);
+  	return array->type;
+}
+
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_type_string
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1string__J(JNIEnv *env, jclass clz, jlong address){
+	jint idx=Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1code(env,clz,address);
+	jstring str=env->NewStringUTF(TYPE_STRING[idx]);
+	return str;
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_type_string
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1string__I(JNIEnv *env, jclass clz, jint idx){
+	jstring str=env->NewStringUTF(TYPE_STRING[idx]);
+	return str;
+}
+

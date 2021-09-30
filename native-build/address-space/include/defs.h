@@ -17,4 +17,6 @@ struct Array{
 	T* pointer;
 };
 
+const char* TYPE_STRING[7]={"Integer","Byte","Short","Long","Float","Double","Object"};
+
 #endif

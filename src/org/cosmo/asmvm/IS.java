@@ -66,6 +66,7 @@ public enum IS {
     LOADD("load-double"),
     LOADS("load-short"),
     LOADL("load-long"),
+    STI("store-int"),
     ANEW("create-object"),
     CALL("call-function"),
     IRETURN("return-integer"),

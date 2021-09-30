@@ -10,13 +10,11 @@ package org.cosmo.asmvm.machine;
  */
 public class TestAddressSpace {
     public static void main(String[] args){
-        int size=99909989;
-        long iarray = AddressSpace.locate_int_array(new int[]{size});
-        System.out.println(iarray);
-        for (int i=0;i<size*4;i++){
-            AddressSpace.put_byte(iarray, i, (byte)0);
-        }
-        System.out.println(AddressSpace.get_int(iarray,0));
+        int size=50;
+        long iarray = AddressSpace.locate_long_array(new int[]{size});
+        System.out.println("Array Type code:"+AddressSpace.get_type_code(iarray));
+        System.out.println("Array Type String:"+AddressSpace.get_type_string(iarray));
+        System.out.println("Array Type String:"+AddressSpace.get_type_string(AddressSpace.get_type_code(iarray)));
         AddressSpace.free_int_array(iarray);
     }
 }
