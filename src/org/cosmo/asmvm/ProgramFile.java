@@ -12,8 +12,8 @@ import java.io.Serializable;
  * @author Sonu Aryan <cosmo-developer@github.com>
  */
 public class ProgramFile implements Serializable {
-    private final int ______bss_Segment_size;
-    private final int ______code_Segment_size;
+    public final int ______bss_Segment_size;
+    public final int ______code_Segment_size;
     private final byte[] ______________bss_Segment;
     private final byte[] __________code_Segment______;
     public ProgramFile(byte[] bss,byte[] code){

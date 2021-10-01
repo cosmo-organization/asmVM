@@ -47,12 +47,12 @@ public class ProgramStructure {
                     rsp += 4;
                     break;
                 }
-                case IDUP:{
-                    this.stackSegment[rsp]=this.stackSegment[rsp-4];
-                    this.stackSegment[rsp+1]=this.stackSegment[rsp-3];
-                    this.stackSegment[rsp+2]=this.stackSegment[rsp-2];
-                    this.stackSegment[rsp+3]=this.stackSegment[rsp-1];
-                    rsp+=4;
+                case IDUP: {
+                    this.stackSegment[rsp] = this.stackSegment[rsp - 4];
+                    this.stackSegment[rsp + 1] = this.stackSegment[rsp - 3];
+                    this.stackSegment[rsp + 2] = this.stackSegment[rsp - 2];
+                    this.stackSegment[rsp + 3] = this.stackSegment[rsp - 1];
+                    rsp += 4;
                 }
                 case IPOP: {
                     rsp -= 4;
@@ -288,6 +288,15 @@ public class ProgramStructure {
         buffer.clear();
         return result;
     }
+    
+    public static long toLong(byte[] bytes,int offset){
+        ByteBuffer buffer=ByteBuffer.allocate(8);
+        buffer.put(bytes,offset,8);
+        buffer.flip();
+        long result=buffer.asLongBuffer().get();
+        buffer.clear();
+        return result;
+    }
 
     public static byte[] readBuffer(byte[] src, int offset, int length) {
         byte[] result = new byte[length];
@@ -311,6 +320,19 @@ public class ProgramStructure {
         result[1] = (byte) ((byte) (integer >> 16) & 0xFF);
         result[2] = (byte) ((byte) (integer >> 8) & 0xFF);
         result[3] = (byte) ((byte) (integer) & 0xFF);
+        return result;
+    }
+
+    public static byte[] toBytes(long value) {
+        byte[] result = new byte[8];
+        result[0] = (byte) ((byte) (value >> 56) & 0xFF);
+        result[1] = (byte) ((byte) (value >> 48) & 0xFF);
+        result[2] = (byte) ((byte) (value >> 40) & 0xFF);
+        result[3] = (byte) ((byte) (value >> 32) & 0xFF);
+        result[4] = (byte) ((byte) (value >> 24) & 0xFF);
+        result[5] = (byte) ((byte) (value >> 16) & 0xFF);
+        result[6] = (byte) ((byte) (value >> 8) & 0xFF);
+        result[7] = (byte) ((byte) (value) & 0xFF);
         return result;
     }
 }

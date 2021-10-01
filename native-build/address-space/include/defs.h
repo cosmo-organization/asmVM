@@ -10,10 +10,10 @@
 #define OBJECT 6
 template<typename T>
 struct Array{
-	int type;
+	unsigned char type;
 	int ndim;
 	int* dims;
-	int size;
+	unsigned int size;
 	T* pointer;
 };
 

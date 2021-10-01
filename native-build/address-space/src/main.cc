@@ -1,40 +1,12 @@
 #include <addressspace.h>
-#include <defs.h>
 #include <stdlib.h>
-
-template<typename T>
-struct get_type{
-	static const int type;
-};
-template<>
-struct get_type<int>{
-	static const int type=INT;
-};
-template<>
-struct get_type<short>{
-	static const int type=SHORT;
-};
-template<>
-struct get_type<unsigned char>{
-	static const int type=BYTE;
-};
-template<>
-struct get_type<float>{
-	static const int type=FLOAT;
-};
-template<>
-struct get_type<double>{
-	static const int type=DOUBLE;
-};
-template<>
-struct get_type<long>{
-	static const int type=LONG;
-};
+#include <util.h>
+#include <stdio.h>
 
 
 template<typename T>
 static jlong locate(JNIEnv *env, jclass clz, jintArray dims){
-	Array<int>* iArray=(Array<int>*)malloc(sizeof(Array<int>));
+	Array<T>* iArray=(Array<T>*)malloc(sizeof(Array<int>));
 	iArray->ndim=env->GetArrayLength(dims);
 	iArray->type=get_type<T>::type;
 	iArray->dims=(int*)malloc(sizeof(int)*iArray->ndim);
@@ -44,7 +16,7 @@ static jlong locate(JNIEnv *env, jclass clz, jintArray dims){
 		iArray->dims[i]=datas[i];
 		size_of_array*=datas[i];
 	}
-	iArray->pointer=(int*)malloc(sizeof(int)*size_of_array);
+	iArray->pointer=(T*)malloc(sizeof(int)*size_of_array);
 	env->ReleaseIntArrayElements(dims,datas,0);
   	iArray->size=size_of_array;
   	return (jlong)iArray;
@@ -125,7 +97,7 @@ JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_locate_1double
  * Signature: ([I)J
  */
 JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_locate_1long_1array(JNIEnv *env, jclass clz, jintArray dims){
-	return locate<long>(env,clz,dims);
+	return locate<long long>(env,clz,dims);
 }
 
 /*
@@ -236,7 +208,7 @@ JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_free_1double_1a
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_free_1long_1array(JNIEnv *env, jclass clz, jlong address){
-	release<long>(env,clz,address);
+	release<long long>(env,clz,address);
 }
 
 /*
@@ -285,7 +257,7 @@ JNIEXPORT jdouble JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1double(
  * Signature: (JI)J
  */
 JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1long(JNIEnv *env, jclass clz, jlong address, jint index){
-	return get<long>(env,clz,address,index);
+	return get<jlong>(env,clz,address,index);
 }
 
 /*
@@ -329,3 +301,66 @@ JNIEXPORT jstring JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1s
 	return str;
 }
 
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_size
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1size(JNIEnv *env, jclass clz, jlong address, jint m_sys){
+	Array<void>* array=reinterpret_cast<Array<void>*>(address);
+	if (m_sys==0){
+		int type_code=Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1code(env,clz,address);
+		int type_size=get_type_size(type_code);
+		return array->size*type_size;
+	}else if(m_sys==1){
+		return array->size;
+	}
+	return -1;
+}
+
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    detect_endian
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_detect_1endian(JNIEnv *, jclass){
+	short testByte=0x0001;
+	return (((testByte>>8)&0xFF)==1)?0:1;
+}
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_byte_stream
+ * Signature: (I)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1byte_1stream(JNIEnv *env, jclass clz,jlong address, jint flag){
+	jint sz=Java_org_cosmo_asmvm_machine_AddressSpace_get_1size(env,clz,address,0);
+	jbyteArray byteArray=env->NewByteArray(sz);
+	jbyte* ptr=env->GetByteArrayElements(byteArray,(jboolean*)0);
+	Array<jbyte>* array=reinterpret_cast<Array<jbyte>*>(address);
+	unsigned int prev_size=array->size;
+	array->size=sz;
+	if (flag==0){
+		if (Java_org_cosmo_asmvm_machine_AddressSpace_detect_1endian(env,clz)==0){
+			
+		}else{
+			//To do here
+		}
+	}else if(flag==1){
+		if (Java_org_cosmo_asmvm_machine_AddressSpace_detect_1endian(env,clz)==1){
+			for (int i=0;i<sz;i++){
+				ptr[i]=(const char)array->pointer[i];
+			}
+		}else{
+			//To do here
+		}
+	}else if(flag==2){
+		for (int i=0;i<sz;i++){
+				*(ptr+i)=get<jbyte>(env,clz,address,i);
+		}
+	}
+	array->size=prev_size;
+	env->ReleaseByteArrayElements(byteArray,ptr,0);
+	return byteArray;
+}

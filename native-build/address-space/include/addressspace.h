@@ -223,6 +223,30 @@ JNIEXPORT jstring JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1s
 JNIEXPORT jstring JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1type_1string__I
   (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_size
+ * Signature: (JI)J
+ */
+JNIEXPORT jlong JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1size
+  (JNIEnv *, jclass, jlong, jint);
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    detect_endian
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_detect_1endian
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_cosmo_asmvm_machine_AddressSpace
+ * Method:    get_byte_stream
+ * Signature: (I)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1byte_1stream
+  (JNIEnv *, jclass,jlong, jint);
+
 #ifdef __cplusplus
 }
 #endif

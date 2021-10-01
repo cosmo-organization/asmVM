@@ -45,4 +45,23 @@ public final class AddressSpace {
     public static native int get_type_code(long address);
     public static native String get_type_string(long address);
     public static native String get_type_string(int type_code);
+    /***
+     * 
+     * @param address address of array
+     * @param m_sys 0 means get size in bytes of any array type 1 means return the size for specific type.
+     * @return 
+     */
+    public static native long get_size(long address,int m_sys);
+    /***
+     * 
+     * @return 0 if host machine is little endian and 1 means big endian
+     */
+    public static native int detect_endian();
+    /**
+     * @param address
+     * @param flag 0 means little endian and 1 means big endian 2 means as it is
+     * @return byte stream of specific type of array 
+     * if flag set to {0,1} then endian formating apply on byte_stream otherwise not
+     */
+    public static native byte[] get_byte_stream(long address,int flag);
 }
