@@ -8,7 +8,10 @@ package org.cosmo.asmvm;
  * @author Sonu Aryan <cosmo-developer@github.com>
  */
 public enum IS {
-    IPUSH("push-int(0 to 255)"),
+    IPUSH("push-int"),
+    IPOP("pop-int"),
+    IDUP("duplicate-int-on-stack"),
+    IPRINT("pop-andprint"),
     SIPUSH("push-short(0 to 255)"),
     BIPUSH("push-byte(-128 to 127)"),
     ICONST0("push int-0-on-stack"),
@@ -99,7 +102,8 @@ public enum IS {
     DADD, DSUB, DMUL, DDIV, DMOD, DAND, DOR, DXOR, DBC, DRSHFT, DLSHFT, DLAND, DLOR, DLNOT, DNE, DET,
     FADD, FSUB, FMUL, FDIV, FMOD, FAND, FOR, FXOR, FBC, FRSHFT, FLSHFT, FLAND, FLOR, FLNOT, FNE, FET,
     //Branch instructions
-    JMPE, JMPNE, JMPGT, JMPLT, JMP;
+    JMPE, JMPNE, JMPGT, JMPLT, JMP,
+    NEWLINE;
     public final String dbgStr;
 
     private IS(String dbgStr) {
