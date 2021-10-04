@@ -13,16 +13,17 @@ import java.util.Arrays;
  */
 public class TestAddressSpace {
     public static void main(String[] args){
-        int size=50;
-        long darray = AddressSpace.locate_double_array(new int[]{size});
-        AddressSpace.put_double(darray, 0, 897);
-        AddressSpace.put_double(darray, 1, 897);
+        int size=1000;
+        long darray = AddressSpace.locate_int_array(new int[]{size});
+        AddressSpace.put_int(darray, 0, 0xFFFFFFFF);
+        AddressSpace.put_int(darray, 1, size);
+        AddressSpace.put_int(darray, 2, size);
+        AddressSpace.put_int(darray, 3, size);
+        
         
 //        System.out.println(AddressSpace.get_size(darray, 0));
         System.out.println(AddressSpace.detect_endian());
         System.out.println(Arrays.toString(AddressSpace.get_byte_stream(darray, 2)));
-        AddressSpace.free_double_array(darray);
-        
-        
+        AddressSpace.free_int_array(darray);   
     }
 }

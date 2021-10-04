@@ -338,28 +338,15 @@ JNIEXPORT jbyteArray JNICALL Java_org_cosmo_asmvm_machine_AddressSpace_get_1byte
 	jint sz=Java_org_cosmo_asmvm_machine_AddressSpace_get_1size(env,clz,address,0);
 	jbyteArray byteArray=env->NewByteArray(sz);
 	jbyte* ptr=env->GetByteArrayElements(byteArray,(jboolean*)0);
-	Array<jbyte>* array=reinterpret_cast<Array<jbyte>*>(address);
+	Array<double>* array=reinterpret_cast<Array<double>*>(address);
 	unsigned int prev_size=array->size;
 	array->size=sz;
-	if (flag==0){
-		if (Java_org_cosmo_asmvm_machine_AddressSpace_detect_1endian(env,clz)==0){
-			
-		}else{
-			//To do here
-		}
-	}else if(flag==1){
-		if (Java_org_cosmo_asmvm_machine_AddressSpace_detect_1endian(env,clz)==1){
-			for (int i=0;i<sz;i++){
-				ptr[i]=(const char)array->pointer[i];
-			}
-		}else{
-			//To do here
-		}
-	}else if(flag==2){
-		for (int i=0;i<sz;i++){
-				*(ptr+i)=get<jbyte>(env,clz,address,i);
-		}
+	
+	char* buffer=reinterpret_cast<char*>(array->pointer);
+	for (unsigned int i=0;i<sz;i++){
+		ptr[i]=buffer[i];
 	}
+	
 	array->size=prev_size;
 	env->ReleaseByteArrayElements(byteArray,ptr,0);
 	return byteArray;
